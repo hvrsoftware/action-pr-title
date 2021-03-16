@@ -35,6 +35,10 @@ inputs:
       Also when generating a new PAT, select the least scopes necessary.
     required: false
     default: ${{ github.token }}
+  error:
+    description: 'Error message if PR message does not meet some requirements'
+    required: false
+    default: ''
 
 runs:
   using: 'node12'

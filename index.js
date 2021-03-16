@@ -36,12 +36,14 @@ async function run() {
         });
 
         const title = pullRequest.title;
+        const error_message = core.getInput('error');
         
         core.info(`Pull Request title: "${title}"`);
 
         // Check if title pass regex
         const regex = RegExp(core.getInput('regex'));
         if (!regex.test(title)) {
+            core.setFailed(error_message);
             core.setFailed(`Pull Request title "${title}" failed to pass match regex - ${regex}`);
             return
         }
@@ -49,6 +51,7 @@ async function run() {
         // Check min length
         const minLen = parseInt(core.getInput('min_length'));
         if (title.length < minLen) {
+            core.setFailed(error_message);
             core.setFailed(`Pull Request title "${title}" is smaller than min length specified - ${minLen}`);
             return
         }
@@ -56,6 +59,7 @@ async function run() {
         // Check max length
         const maxLen = parseInt(core.getInput('max_length'));
         if (maxLen > 0 && title.length > maxLen) {
+            core.setFailed(error_message);
             core.setFailed(`Pull Request title "${title}" is greater than max length specified - ${maxLen}`);
             return
         }
@@ -65,6 +69,7 @@ async function run() {
         const prefixCaseSensitive = (core.getInput('prefix_case_sensitive') === 'true');
         core.info(`Allowed Prefixes: ${prefixes}`);
         if (prefixes.length > 0 && !prefixes.split(',').some((el) => validateTitlePrefix(title, el, prefixCaseSensitive))) {
+            core.setFailed(error_message);
             core.setFailed(`Pull Request title "${title}" did not match any of the prefixes - ${prefixes}`);
             return
         }
@@ -73,6 +78,7 @@ async function run() {
         prefixes = core.getInput('disallowed_prefixes');
         core.info(`Disallowed Prefixes: ${prefixes}`);
         if (prefixes.length > 0 && prefixes.split(',').some((el) => validateTitlePrefix(title, el, prefixCaseSensitive))) {
+            core.setFailed(error_message);
             core.setFailed(`Pull Request title "${title}" matched with a disallowed prefix - ${prefixes}`);
             return
         }
